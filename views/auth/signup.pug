@@ -1,0 +1,60 @@
+extends ../layouts/master
+
+block content
+    // Main container div with flex, minimum height, and padding
+    div.flex.min-h-full.flex-col.justify-center.py-12(class='sm:px-6 lg:px-8')
+        // Inner div for centering content within the screen size constraints
+        div(class='sm:mx-auto sm:w-full sm:max-w-md')
+            // Centered company logo image
+            img.mx-auto.h-10.w-auto(src='https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600', alt='Your Company')
+            // Heading for the sign-up form
+            h2.mt-6.text-center.text-2xl.font-bold.leading-9.tracking-tight.text-gray-900 Sign in to your account
+        // Another inner div with margin top and width constraints
+        div.mt-10(class='sm:mx-auto sm:w-full sm:max-w-[480px]')
+            // Container div for the form with background, padding, and shadow
+            div.bg-white.px-6.py-12.shadow(class='sm:rounded-lg sm:px-12')
+                // Div to display errors if any
+                div.w-full.block
+                    // If there are errors and the array is not empty, display them in an unordered list
+                    - if(errors && errors.length > 0)
+                        ul.block.w-full.bg-red-300.p-3.rounded.my-3
+                        // Loop through each error and display it as a list item
+                        for error in errors
+                            li.text-red-500 #{error}
+
+                // Form with spacing between inputs
+                form.space-y-6(action='#', method='POST')
+                    // First name input field
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='email') First name
+                        div.mt-2
+                            input#fname.block.w-full.rounded-md.border-0.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='first_name', type='text',  class='py-1.5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                    // Last name input field
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='email') Last name
+                        div.mt-2
+                            input#lname.block.w-full.rounded-md.border-0.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='last_name', type='text', class='py-1.5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                    // Email input field
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='email') Email address
+                        div.mt-2
+                            input#email.block.w-full.rounded-md.border-0.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='email', type='email', autocomplete='email',  class='py-1.5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                    // Password input field
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='password') Password
+                        div.mt-2
+                            input#password.block.w-full.rounded-md.border-0.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='password', type='password', autocomplete='current-password', class='py-1.5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                    // Confirm Password input field
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='password') Confirm Password
+                        div.mt-2
+                            input#conf_password.block.w-full.rounded-md.border-0.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='confirmPassword', type='password', autocomplete='current-password', class='py-1.5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                    // Submit button
+                    div
+                        button.flex.w-full.justify-center.items-center.rounded-md.bg-gray-800.px-3.text-sm.font-semibold.leading-6.text-white.shadow-sm.h-14(type='submit', class='py-1.5 hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800') Signup
+
+                    // Text prompting user to check if they already have an account
+                    p.text-center Already have an account?
+                        // Link to the login page
+                        p.text-center.text-blue-500
+                            a(href="/auth/login") Login here

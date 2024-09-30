@@ -3,17 +3,38 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const session = require('express-session')
 
+//Import all modules needed
+//Import the index router and its content
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const db = require('./database')
 const PORT = 3000;
 const app = express();
+
+// Session Setup
+app.use(session({
+
+  // holds the secret key for session
+  secret: 'gyU@oQJXAXVHzayWDSH',
+
+  // Forces the session to be saved
+  // back to the session store
+  resave: true,
+
+  // Forces a session that is "uninitialized"
+  // to be saved to the store
+  saveUninitialized: true
+}))
 
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.set('db', db);
 
+//Use the modules imported in the app.
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -37,6 +58,14 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+app.get('/success', (req, res) => {
+  res.render('success');
+});
+
+// Route for signup page
+app.get('/signup', (req, res) => {
+  res.render('signup');
 });
 
 app.listen(PORT, ()=> console.log('Running server on port ' + PORT))

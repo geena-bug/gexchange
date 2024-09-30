@@ -1,0 +1,36 @@
+extends ../layouts/user-panel
+
+block user-panel
+    .px-4(class='sm:px-6 lg:px-8')
+        div(class='sm:flex sm:items-center')
+            div(class='sm:flex-auto')
+                h1.text-base.font-semibold.leading-6.text-gray-900 Convert between currencies
+            .mt-4(class='sm:ml-16 sm:mt-0 sm:flex-none')
+        div.flex.min-h-full.flex-row.justify-center.py-12.items-center(class='sm:px-6 lg:px-8')
+            div.mt-10(class='sm:mx-auto sm:w-full sm:max-w-[480px]')
+                form.space-y-6(action='#', method='GET')
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='amount') Amount
+                        div.mt-2
+                            input#amount.block.w-full.rounded-md.border-0.text-gray-900.shadow-sm.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='amount', type='text', required=true, class='py-1.5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6', onkeypress='return event.charCode >= 48 && event.charCode <= 57')
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='currency_from') Currency from
+                        div.mt-2
+                            select#currency_from.mt-2.block.w-full.rounded-md.border-0.pl-3.pr-10.text-gray-900.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='location', required=true, class='py-1.5 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                                - for(let country of countries)
+                                    option(value=country.currency_code) #{country.currency_code} - #{country.name}
+
+                    div
+                        label.block.text-sm.font-medium.leading-6.text-gray-900(for='currency_to') Currency to
+                        div.mt-2
+                            select#currency_to.mt-2.block.w-full.rounded-md.border-0.pl-3.pr-10.text-gray-900.ring-1.ring-inset.ring-gray-300.h-14.px-5(name='location', required=true, class='py-1.5 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6')
+                                - for(let country of countries)
+                                    option(value=country.currency_code) #{country.currency_code} - #{country.name}
+                    div
+                        button.flex.w-full.justify-center.items-center.rounded-md.bg-gray-800.px-3.text-sm.font-semibold.leading-6.text-white.shadow-sm.h-14#convert_button(type='button', class='py-1.5 hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800') Convert
+            span.sr-only#userid #{userId}
+            div.mt-10(class='sm:mx-auto sm:w-full sm:max-w-[480px]')
+                div.w-full
+                    p.px-5.text-center.text-5xl.text-gray-500#conversion_result $0.000
+                    p.text-xs.text-center.text-gray-300#conversion_time
+                    p.text-xs.text-center.text-gray-300#conversion_rate
