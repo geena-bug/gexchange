@@ -1,17 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const validations = require('../middelware/auth-validations')
-const controllers = require('../controllers/auth-controller')
+const controllers = require('../controllers/home-controller')
 
 /* GET Signup and login page. */
-router.get('/auth/signup',controllers.signUp);
-
-router.get('/auth/login', controllers.login);
-
-/* Submit signup and login page. */
-router.post('/auth/signup',[validations.signUpValidation], controllers.processSignup);
-
-router.post('/auth/login', [validations.loginValidation], controllers.processLogin);
+router.get('/',controllers.home);
 
 //Export router contents
 module.exports = router;

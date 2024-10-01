@@ -169,7 +169,7 @@ const logout = async (req, res) => {
     delete req.session.user
 
     //redirect to the account update page
-    return res.redirect('/auth/login');
+    return res.redirect('/');
 }
 
 const liveExchange = async (req, res) => {

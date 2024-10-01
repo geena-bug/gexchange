@@ -18,9 +18,9 @@ block content
                     // If there are errors and the array is not empty, display them in an unordered list
                     - if(errors && errors.length > 0)
                         ul.block.w-full.bg-red-300.p-3.rounded.my-3
-                        // Loop through each error and display it as a list item
-                        for error in errors
-                            li.text-red-500 #{error}
+                            // Loop through each error and display it as a list item
+                            for error in errors
+                                li.text-red-500 #{error}
 
                 // Form with spacing between inputs
                 form.space-y-6(action='#', method='POST')

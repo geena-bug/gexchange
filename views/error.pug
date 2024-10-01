@@ -1,6 +1,9 @@
 extends layouts/master
 
 block content
+  //This Pug template is designed to render an error page. message and error are variables passed to this template.
+  //The message is likely a human-readable explanation of the error, error.status is the HTTP status code, and
+  //error.stack is the stack trace for debugging purposes.
   h1= message
   h2= error.status
   pre #{error.stack}

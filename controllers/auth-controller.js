@@ -8,6 +8,13 @@ module.exports.signUp = (req, res) => {
     });
 };
 
+module.exports.signUpSuccess = (req, res) => {
+    // Render the signup page with a pageTitle
+    res.render('auth/signup-success', {
+        pageTitle: 'Signup',
+    });
+};
+
 // Export the login function
 module.exports.login = (req, res) => {
     // Redirect user back to dashboard if authenticated
@@ -25,7 +32,7 @@ module.exports.processLogin = async (req, res) => {
     // Validate fields
     const validate = validationResult(req);
     const password = req.body.password;
-    const email = req.body.email;
+    const email = req.body.email.toLowerCase();
     // Extract the error messages
     let errors = validate.array().map(error => error.msg);
 
