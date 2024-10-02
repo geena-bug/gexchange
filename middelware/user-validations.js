@@ -1,44 +1,65 @@
-const {body} = require('express-validator')
+// Import express-validator for request body validation
+const { body } = require('express-validator');
 
+// Validation rules for currency conversion
 const conversionValidation = [
+    // Validate 'currencyFrom' field
     body('currencyFrom', "Currency from is required")
-        .exists()
-        .isLength({min: 1})
-        .trim(),
+        .exists() // Check if field exists
+        .isLength({ min: 1 }) // Minimum length of 1 character
+        .trim(), // Remove excess whitespace
 
+    // Validate 'currencyTo' field
     body('currencyTo', "Currency to is required")
-        .isLength({min: 1})
-        .trim(),
+        .isLength({ min: 1 }) // Minimum length of 1 character
+        .trim(), // Remove excess whitespace
 
+    // Validate 'amount' field
     body('amount', "Amount is required")
-        .isNumeric()
-        .isLength({min: 1}),
+        .isNumeric() // Check if value is numeric
+        .isLength({ min: 1 }), // Minimum length of 1 character
 
+    // Validate 'convertedAmount' field
     body('convertedAmount', "Converted Amount is required")
-        .isLength({min: 4})
-        .isNumeric({min: 1}),
+        .isLength({ min: 4 }) // Minimum length of 4 characters
+        .isNumeric({ min: 1 }), // Check if value is numeric with minimum 1 digit
 
+    // Validate 'userId' field
     body('userId', "User id is required")
-        .isLength({min: 4})
-        .isNumeric({min: 1})
-]
+        .isLength({ min: 4 }) // Minimum length of 4 characters
+        .isNumeric({ min: 1 }), // Check if value is numeric with minimum 1 digit
+];
 
+// Validation rules for updating account information
 const updateAccountValidation = [
+    // Validate 'first_name' field
     body('first_name', "First name is required")
-        .exists()
-        .isLength({min: 3})
-        .trim(),
+        .exists() // Check if field exists
+        .isLength({ min: 3 }) // Minimum length of 3 characters
+        .trim(), // Remove excess whitespace
 
+    // Validate 'last_name' field
     body('last_name', "Last name is required")
-        .isLength({min: 3})
-        .trim(),
+        .isLength({ min: 3 }) // Minimum length of 3 characters
+        .trim(), // Remove excess whitespace
 
+    // Validate 'email' field
     body('email', "Invalid email")
-        .isEmail()
-        .trim(),
-]
+        .isEmail() // Check if value is a valid email
+        .trim(), // Remove excess whitespace
+];
 
+// Validation rules for photo upload
+const photoUploadValidator = [
+    // Validate 'photo' field
+    body('photo', "Please select an image to upload")
+        .exists() // Check if field exists
+        .isLength({ min: 1 }), // Minimum length of 1 character
+];
+
+// Export validation rules as a module
 module.exports = {
     conversionValidation,
-    updateAccountValidation
-}
+    updateAccountValidation,
+    photoUploadValidator,
+};

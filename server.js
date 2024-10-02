@@ -1,66 +1,63 @@
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-const session = require('express-session')
+const createError = require('http-errors'); // Import the http-errors module to handle HTTP errors
+const express = require('express'); // Import Express framework
+const path = require('path'); // Import path module to handle file and directory paths
+const cookieParser = require('cookie-parser'); // Import cookie-parser to parse cookies
+const logger = require('morgan'); // Import morgan for logging HTTP requests
+const session = require('express-session'); // Import express-session to manage sessions
 
-//Import all modules needed
-//Import the index router and its content
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const authRouter = require('./routes/auth');
+// Import all route modules
+const indexRouter = require('./routes/index'); // Router for handling index (home) routes
+const usersRouter = require('./routes/users'); // Router for handling user-related routes
+const authRouter = require('./routes/auth'); // Router for handling authentication routes
 
-const db = require('./database')
-const PORT = 3000;
-const app = express();
+const db = require('./database'); // Import the database connection
+const PORT = 3000; // Define the port the server will run on
+const app = express(); // Create an instance of the Express application
 
 // Session Setup
 app.use(session({
-
-  // holds the secret key for session
+  // Secret key used to sign the session ID cookie
   secret: 'gyU@oQJXAXVHzayWDSH',
 
-  // Forces the session to be saved
-  // back to the session store
+  // Forces the session to be saved back to the session store, even if it wasn't modified
   resave: true,
 
-  // Forces a session that is "uninitialized"
-  // to be saved to the store
+  // Forces an uninitialized session (a session that is new but hasn't been modified) to be saved to the store
   saveUninitialized: true
-}))
+}));
 
+// Set up the view engine
+app.set('views', path.join(__dirname, 'views')); // Set the directory where the view files are located
+app.set('view engine', 'pug'); // Set Pug as the template engine
+app.set('db', db); // Store the database connection in the app instance
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-app.set('db', db);
+// Use the imported middleware
+app.use(logger('dev')); // Use morgan logger with 'dev' format to log requests
+app.use(express.json()); // Parse incoming JSON request bodies
+app.use(express.urlencoded({ extended: false })); // Parse incoming URL-encoded data
+app.use(cookieParser()); // Parse cookies attached to the client request
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory
 
-//Use the modules imported in the app.
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// Set up routes
+app.use('/', indexRouter); // Use the indexRouter for the root URL
+app.use('/users', usersRouter); // Use the usersRouter for '/users' URL
+app.use('/auth', authRouter); // Use the authRouter for '/auth' URL
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/auth', authRouter);
-
-// catch 404 and forward to error handler
+// Catch 404 errors and forward them to the error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404)); // If no route matches, create a 404 error
 });
 
-// error handler
+// Error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // Set local variables for the error, only providing error details in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  // Render the error page
+  res.status(err.status || 500); // Set the status code to the error status or default to 500
+  res.render('error'); // Render the 'error' view
 });
 
-app.listen(PORT, ()=> console.log('Running server on port ' + PORT))
+// Start the server on the specified port
+app.listen(PORT, () => console.log('Running server on port ' + PORT)); // Log that the server is running

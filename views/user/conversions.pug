@@ -21,6 +21,7 @@ block user-panel
                                     th.px-3.text-left.text-sm.font-semibold.text-gray-900(scope='col', class='py-3.5') Converted Amount
                                     th.px-3.text-left.text-sm.font-semibold.text-gray-900(scope='col', class='py-3.5') Amount
                                     th.relative.pl-3.pr-4(scope='col', class='py-3.5 sm:pr-6') Date created
+                                    th.relative.pl-3.pr-4(scope='col', class='py-3.5 sm:pr-6') Action
                             tbody.divide-y.divide-gray-200.bg-white
                                 for conversion in conversions
                                     - const conversionFrom = currencies.find(currency => currency.currency_code === conversion.currency_from)
@@ -32,8 +33,9 @@ block user-panel
                                         td.whitespace-nowrap.px-3.py-4.text-sm.text-gray-500 #{conversionTo.currency_code} - #{conversionTo.name}
                                         td.whitespace-nowrap.px-3.py-4.text-sm.text-gray-500 #{conversionFrom.currency_code} #{conversion.amount}
                                         td.whitespace-nowrap.px-3.py-4.text-sm.text-gray-500 #{formattedAmount}
+                                        td.relative.whitespace-nowrap.py-4.pl-3.pr-4.text-right.text-sm.font-medium(class='sm:pr-6') #{conversion.conversion_date}
                                         td.relative.whitespace-nowrap.py-4.pl-3.pr-4.text-right.text-sm.font-medium(class='sm:pr-6')
-                                            a.text-indigo-600(href='#', class='hover:text-indigo-900')
-                                                | #{conversion.conversion_date}
+                                            a.text-indigo-600.text-right(href='/users/delete-conversions?conversion_id=' + conversion.id , class='hover:text-indigo-900')
+                                                img(src='/images/delete-icon.png')
 
                                 // More people...

@@ -8,7 +8,11 @@ block content
           nav.flex.items-center.justify-between(class='lg:justify-start', aria-label='Global')
             a(href='#', class='-m-1.5 p-1.5')
               span.sr-only Your Company
-              img.h-8.w-auto(alt='Your Company', src='https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600')
+              span.text-indigo-600.h-12.w-auto.block
+                svg#warehouse(fill='currentColor' xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewbox='0 0 15 15')
+                  path(d='M13.5,5c-0.0762,0.0003-0.1514-0.0168-0.22-0.05L7.5,2L1.72,4.93C1.4632,5.0515,1.1565,4.9418,1.035,4.685\
+                  S1.0232,4.1215,1.28,4L7.5,0.92L13.72,4c0.2761,0.0608,0.4508,0.3339,0.39,0.61C14.0492,4.8861,13.7761,5.0608,13.5,5z M5,10H2v3h3\
+                  V10z M9,10H6v3h3V10z M13,10h-3v3h3V10z M11,6H8v3h3V6z M7,6H4v3h3V6z')
             button.rounded-md.text-gray-700(type='button', class='-m-2.5 p-2.5 lg:hidden')
               span.sr-only Open main menu
               svg.h-6.w-6(fill='none', viewBox='0 0 24 24', stroke-width='1.5', stroke='currentColor', aria-hidden='true')

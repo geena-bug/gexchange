@@ -1,4 +1,5 @@
 const express = require('express');
+const uuid = require('uuid')
 const router = express.Router();
 const userController = require('../controllers/users-controller')
 const validation = require('../middelware/user-validations')
@@ -12,7 +13,10 @@ const storage = multer.diskStorage({
   },
   //configure the filename to be used while saving the file
   filename: function (req, file, cb) {
-    cb(null, file.originalname)
+    //extract file extension
+    let ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
+    //generate new file name for the uploaded file e.g 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d.jpg
+    cb(null, uuid.v4() + ext)
   }
 })
 const upload = multer({storage: storage})
@@ -22,6 +26,7 @@ const upload = multer({storage: storage})
 router.get('/', userController.dashboard);
 //Load conversions page
 router.get('/conversions', userController.listConversions);
+router.get('/delete-conversions', userController.deleteHistory);
 //Load live exchange page
 router.get('/live-exchange', userController.liveExchange);
 

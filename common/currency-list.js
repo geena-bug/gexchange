@@ -1,3 +1,4 @@
+//List of currency
 const currencyList = [
     {
         "name": "Afghanistan",
