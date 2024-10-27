@@ -1,0 +1,32 @@
+extends ../layouts/user-panel
+
+block user-panel
+    .px-4(class='sm:px-6 lg:px-8')
+        div(class='sm:flex sm:items-center')
+            div(class='sm:flex-auto')
+                h1.text-base.font-semibold.leading-6.text-gray-900
+                p.mt-2.text-sm.text-gray-700
+                    | List of recent activities.
+            .mt-4(class='sm:ml-16 sm:mt-0 sm:flex-none')
+        .mt-8.flow-root
+            .-mx-4.-my-2.overflow-x-auto(class='sm:-mx-6 lg:-mx-8')
+                .inline-block.min-w-full.py-2.align-middle(class='sm:px-6 lg:px-8')
+                    .overflow-hidden.shadow.ring-1.ring-black.ring-opacity-5(class='sm:rounded-lg')
+                        table.min-w-full.divide-y.divide-gray-300
+                            thead.bg-gray-50
+                                tr
+                                    th.px-3.text-left.text-sm.font-semibold.text-gray-900(scope='col', class='py-3.5') Action
+                                    th.relative.pl-3.pr-4.text-right(scope='col', class='py-3.5 sm:pr-6') Date
+                            tbody.divide-y.divide-gray-200.bg-white
+                                - counter = 1
+                                for activity in activities
+                                    - if(activity && counter <= 4)
+                                        tr
+                                            td.whitespace-nowrap.px-3.py-4.text-sm.text-gray-500 #{activity.action}
+
+                                            td.relative.whitespace-nowrap.py-4.pl-3.pr-4.text-right.text-sm.font-medium(class='sm:pr-6')
+                                                a.text-indigo-600(href='#', class='hover:text-indigo-900')
+                                                    | #{activity.timestamp}
+                                    - counter++
+
+                                // More people...

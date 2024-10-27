@@ -4,27 +4,17 @@ const path = require('path'); // Import path module to handle file and directory
 const cookieParser = require('cookie-parser'); // Import cookie-parser to parse cookies
 const logger = require('morgan'); // Import morgan for logging HTTP requests
 const session = require('express-session'); // Import express-session to manage sessions
+const flash = require("connect-flash");
+const passport = require('./lib/passport'); // Import passport for authentication
 
 // Import all route modules
 const indexRouter = require('./routes/index'); // Router for handling index (home) routes
 const usersRouter = require('./routes/users'); // Router for handling user-related routes
 const authRouter = require('./routes/auth'); // Router for handling authentication routes
 
-const db = require('./database'); // Import the database connection
+const db = require('./database');
 const PORT = 3000; // Define the port the server will run on
 const app = express(); // Create an instance of the Express application
-
-// Session Setup
-app.use(session({
-  // Secret key used to sign the session ID cookie
-  secret: 'gyU@oQJXAXVHzayWDSH',
-
-  // Forces the session to be saved back to the session store, even if it wasn't modified
-  resave: true,
-
-  // Forces an uninitialized session (a session that is new but hasn't been modified) to be saved to the store
-  saveUninitialized: true
-}));
 
 // Set up the view engine
 app.set('views', path.join(__dirname, 'views')); // Set the directory where the view files are located
@@ -38,10 +28,36 @@ app.use(express.urlencoded({ extended: false })); // Parse incoming URL-encoded 
 app.use(cookieParser()); // Parse cookies attached to the client request
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory
 
+// Session Setup
+app.use(session({
+  // Secret key used to sign the session ID cookie
+  secret: 'gyU@oQJXAXVHzayWDSH',
+
+  // Forces the session to be saved back to the session store, even if it wasn't modified
+  resave: true,
+
+  // Forces an uninitialized session (a session that is new but hasn't been modified) to be saved to the store
+  saveUninitialized: true
+}));
+app.use(flash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(function(req, res, next){
+  res.locals.message = req.flash();
+  next();
+});
+
 // Set up routes
 app.use('/', indexRouter); // Use the indexRouter for the root URL
 app.use('/users', usersRouter); // Use the usersRouter for '/users' URL
 app.use('/auth', authRouter); // Use the authRouter for '/auth' URL
+app.get('/test-flash', (req, res) => {
+  // req.flash('error_msg', 'Flash message working correctly!');
+  req.flash('success', 'Welcome!!');
+  res.redirect('/auth/login');
+});
 
 // Catch 404 errors and forward them to the error handler
 app.use(function(req, res, next) {
@@ -58,6 +74,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500); // Set the status code to the error status or default to 500
   res.render('error'); // Render the 'error' view
 });
+
 
 // Start the server on the specified port
 app.listen(PORT, () => console.log('Running server on port ' + PORT)); // Log that the server is running

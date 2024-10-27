@@ -1,28 +1,22 @@
 const fs = require('fs') // Import the file system module to handle file operations
+const multer  = require('multer');
 const countryList = require('../common/currency-list') // Import the list of countries/currencies
 const { validationResult } = require('express-validator') // Import validation result from express-validator
+const {trackActivity} = require('../common/track-activity')
+const upload = require('../lib/multer-upload') // Import the upload function from the upload module
 
 const dashboard = (req, res) => {
-    // Redirect user back to login page if not authenticated
-    if (!req.session.user) {
-        return res.redirect('/auth/login') // If no user session exists, redirect to login
-    }
-
     // Render the user dashboard with relevant data
+    trackActivity({req, action: 'Visited dashboard'})
+
     res.render('user/dashboard', {
         pageTitle: 'Converter', // Set the page title
         countries: countryList, // Pass the country/currency list
-        userId: req.session.user.id, // Pass the user's ID from session
-        userPhoto: req.session.user.photo // Pass the user's photo from session
+        user: req.user
     });
 }
 
 const saveConversion = (req, res) => {
-    // Redirect user back to login page if not authenticated
-    if (!req.session.user) {
-        return res.redirect('/auth/login') // If no user session exists, redirect to login
-    }
-
     // Extract conversion data from the request body
     const userId = req.body.userId
     const currencyFrom = req.body.currencyFrom
@@ -36,7 +30,7 @@ const saveConversion = (req, res) => {
         INSERT INTO conversions (user_id, currency_from, currency_to, amount, converted_amount, conversion_date) VALUES (?, ?, ?, ?, ?, ?)
     `, [userId, currencyFrom, currencyTo, amount, convertedAmount, convertedDate.toDateString()]
     )
-
+    trackActivity({req, action: 'Saved a conversion'}) // Track user activity
     // Respond with a success message
     return res.json({
         message: 'Conversion saved'
@@ -44,13 +38,8 @@ const saveConversion = (req, res) => {
 }
 
 const listConversions = async (req, res) => {
-    // Redirect user back to login page if not authenticated
-    if (!req.session.user) {
-        return res.redirect('/auth/login') // If no user session exists, redirect to login
-    }
-
     // Get current logged-in user's ID from the session
-    const userId = req.session.user.id
+    const userId = req.user.id
 
     // Fetch the user's conversion history from the database
     const dbQuery = new Promise((resolve, reject) => {
@@ -73,23 +62,18 @@ const listConversions = async (req, res) => {
         pageTitle: 'My Conversions', // Set the page title
         conversions: result, // Pass the conversion data
         currencies: countryList, // Pass the country/currency list
-        userPhoto: req.session.user.photo // Pass the user's photo from session
+        user: req.user
     });
 }
 
 const updateAccountFormSubmit = async (req, res) => {
-    // Redirect user back to login page if not authenticated
-    if (!req.session.user) {
-        return res.redirect('/auth/login') // If no user session exists, redirect to login
-    }
-
     // Validate the form fields
     const validate = validationResult(req)
     const firstname = req.body.first_name
     const lastname = req.body.last_name
     let password = req?.body?.password // Optional chaining for password
     const email = req.body.email
-    const userId = req.session.user.id
+    const userId = req.user.id
 
     let errors = []
     // Check if validation failed, collect error messages
@@ -127,21 +111,18 @@ const updateAccountFormSubmit = async (req, res) => {
         }
     }
 
+    trackActivity({req, action: 'Updated account data'}) // Track user activity
+
     // Redirect to the account update page after submission
     return res.redirect('/users/update-account');
 }
 
 const updateAccount = async (req, res) => {
-    // Redirect to login page if user is not logged in
-    if (!req.session.user) {
-        return res.redirect('/auth/login') // If no user session exists, redirect to login
-    }
-
     // Fetch current user details from the database
     const dbQuery = new Promise((resolve, reject) => {
         req.app.get('db').all(`
             SELECT * FROM users WHERE id = ?
-        `, [req.session.user.id], (err, rows) => {
+        `, [req.user.id], (err, rows) => {
             if (err) {
                 reject(err) // Handle database error
             }
@@ -158,40 +139,57 @@ const updateAccount = async (req, res) => {
     res.render('user/update-account', {
         pageTitle: 'Update Account', // Set the page title
         userData: user, // Pass the user's data
-        userPhoto: req.session.user.photo // Pass the user's photo from session
+        user: req.user
     });
 }
 
 const uploadPhoto = async (req, res) => {
-    const filename = req.file.filename // Get the uploaded file's filename
-    const currentPhoto = req.session.user.photo // Get the current user photo from the session
+    const currentPhoto = req.user.photo // Get the current user photo from the session
 
-    // Update the user photo in the database
-    req.app.get('db').run(`
-        UPDATE users SET photo = ? WHERE id = ?
-    `, [filename, req.session.user.id])
+    const uploadSingle = upload.single('photo')
 
-    // Update the user session data with the new photo
-    req.session.user = {
-        ...req.session.user,
-        photo: filename,
-    }
+    uploadSingle(req, res, function(err) {
+        if (err instanceof multer.MulterError) {
+            req.flash('uploadError', 'File too large. Maximum size is 1MB')
+            return res.redirect('/users/update-account')
+        } else if (err) {
+            req.flash('uploadError', 'Only image files are allowed')
+            return res.redirect('/users/update-account')
+        }
 
-    // Delete the old photo from the filesystem
-    fs.unlink(process.cwd() + '/public/images/' + currentPhoto, function (err) {
-        console.log(err) // Log any errors
+        // File upload successful - proceed with database update
+        const photoPath = req.file.filename
+
+        // Update the user photo in the database
+        req.app.get('db').run(`
+            UPDATE users SET photo = ? WHERE id = ?
+        `, [photoPath, req.user.id])
+
+        // Update the user session data with the new photo
+        req.user = {
+            ...req.user,
+            photo: photoPath,
+        }
+
+        // Delete the old photo from the filesystem
+        fs.unlink(process.cwd() + '/public/images/' + currentPhoto, function (err) {
+            console.log(err) // Log any errors
+        })
+        // Redirect to the account update page
+        req.flash('success', 'Photo uploaded successfully')
+        trackActivity({req, action: 'Uploaded new photo'}) // Track user activity
+
+        // Redirect to the account update page
+        return res.redirect('/users/update-account');
     })
-
-    // Redirect to the account update page
-    return res.redirect('/users/update-account');
 }
 
-const logout = async (req, res) => {
-    // Delete the user session
-    delete req.session.user
-
-    // Redirect to the homepage
-    return res.redirect('/');
+const logout = async (req, res, next) => {
+    trackActivity({req, action: 'Logged out'}) // Track user activity
+    req.logout(err => {
+        if (err) return next(err);
+        res.redirect('/auth/login');
+    });
 }
 
 const deleteHistory = async (req, res) => {
@@ -200,6 +198,8 @@ const deleteHistory = async (req, res) => {
 
     // Delete the conversion record from the database
     req.app.get('db').run(`DELETE FROM conversions WHERE ID = ?`, [conversionId])
+
+    trackActivity({req, action: 'Deleted a conversion history'}) // Track user activity
 
     // Redirect to the conversions page
     return res.redirect('/users/conversions');
@@ -215,13 +215,26 @@ const liveExchange = async (req, res) => {
     // Parse the JSON response from the API
     const data = await request.json()
 
+    trackActivity({req, action: 'Performed a live exchange'}) // Track user activity
+
     // Render the live exchange rates page
     res.render('user/live-exchange', {
         pageTitle: 'Current Exchange Rate', // Set the page title
         rates: data.conversion_rates, // Pass the exchange rates data
         currencies: countryList, // Pass the list of countries/currencies
         updated_date: data.time_last_update_utc, // Pass the last updated date
-        userPhoto: req.session.user.photo // Pass the user's photo from session
+        user: req.user
+    });
+}
+
+const recentActivity = async (req, res) => {
+    // Render the live exchange rates page
+    const activities = req.session.activities
+    activities.reverse();
+    res.render('user/recent-activities', {
+        pageTitle: 'Recent Activities', // Set the page title
+        activities: activities.filter(activity => activity.userId === req.user.id), // Pass the user's activities
+        user: req.user
     });
 }
 
@@ -236,4 +249,5 @@ module.exports = {
     logout,
     liveExchange,
     deleteHistory,
+    recentActivity,
 }

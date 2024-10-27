@@ -1,4 +1,6 @@
-const { validationResult } = require('express-validator'); // Import the validationResult method from express-validator to handle form validation results
+const { validationResult } = require('express-validator');
+const passport = require("../lib/passport"); // Import the validationResult method from express-validator to handle form validation results
+const {trackActivity} = require('../common/track-activity') // Import the track activity function
 
 // Export the signUp function to render the signup page
 module.exports.signUp = (req, res) => {
@@ -19,13 +21,16 @@ module.exports.signUpSuccess = (req, res) => {
 // Export the login function to render the login page
 module.exports.login = (req, res) => {
     // Check if the user is already authenticated (logged in)
-    if (req.session.user) {
+    if (req.isAuthenticated()) {
         // If the user is authenticated, redirect them to the user's dashboard or profile
         return res.redirect('/users');
     }
+    //get user email from cookie
+    const userEmail = req.cookies?.userEmail;
     // Render the login page and pass the pageTitle variable
     res.render('auth/login', {
         pageTitle: 'Login', // Set the page title to "Login"
+        userEmail,
     });
 };
 
@@ -144,3 +149,47 @@ module.exports.processSignup = async (req, res) => {
         errors // Pass the error messages to be displayed
     });
 };
+
+module.exports.processPassportLogin = (req, res) => {
+    const validate = validationResult(req);
+    const password = req.body.password; // Get the submitted password
+    const email = req.body.email.toLowerCase(); // Get the submitted email and convert it to lowercase
+
+    // Extract error messages from the validation result
+    let errors = validate.array().map(error => error.msg);
+
+    // Check if there are validation errors
+    if (!validate.isEmpty()) {
+        errors = validate.array().map(error => error.msg); // Extract error messages if validation failed
+    }
+
+    // Extract the email and password from the request body
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            req.flash('error', 'An error occurred during login.')
+            return res.redirect('/auth/login');
+        }
+        if (!user) {
+            req.flash('error', 'Invalid username or password');
+            return res.redirect('/auth/login');
+        }
+        req.logIn(user, (err) => {
+            if (err) {
+                req.flash('error', 'Login failed.');
+                return res.redirect('/auth/login');
+            }
+            req.flash('success', 'You are now logged in.');
+            //track user activity
+            trackActivity({req, action: 'Logged in'});
+
+            //save user email in cookie if remember me is checked
+            if(req.body.remember_me){
+                res.cookie('userEmail', req.body.username, {
+                    maxAge: 60 * 24 * 60 * 60 * 1000, // 60 days in milliseconds
+                    httpOnly: true,
+                });
+            }
+            return res.redirect('/users');
+        });
+    })(req, res);
+}
