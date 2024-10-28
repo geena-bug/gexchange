@@ -18,7 +18,7 @@ const dashboard = (req, res) => {
 
 const saveConversion = (req, res) => {
     // Extract conversion data from the request body
-    const userId = req.body.userId
+    const userId = req.user.id
     const currencyFrom = req.body.currencyFrom
     const currencyTo = req.body.currencyTo
     const amount = req.body.amount
