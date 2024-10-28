@@ -17,12 +17,12 @@ block content
                                 .hidden(class='md:block')
                                     .ml-10.flex.items-baseline.space-x-4
                                         // Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
-                                        a.rounded-md.bg-gray-900.px-3.py-2.text-sm.font-medium.text-white(href='/users', aria-current='page') Converter
-                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/conversions', class='hover:bg-gray-700 hover:text-white') My Conversions
-                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/update-account', class='hover:bg-gray-700 hover:text-white') Update Account
-                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/live-exchange', class='hover:bg-gray-700 hover:text-white') Live Exchange Rates
-                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/recent-activities', class='hover:bg-gray-700 hover:text-white') Activities
-                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/logout', class='hover:bg-gray-700 hover:text-white') Logout
+                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-white(href='/users' class=`${pageTitle === 'Converter' ? 'bg-gray-900' : ''}`) Converter
+                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/conversions', class='hover:bg-gray-700 hover:text-white ' + `${pageTitle === 'My Conversions' ? 'bg-gray-900' : ''}`, aria-current='page') My Conversions
+                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/update-account', class='hover:bg-gray-700 hover:text-white ' + `${pageTitle === 'Update Account' ? 'bg-gray-900' : ''}`) Update Account
+                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/live-exchange', class='hover:bg-gray-700 hover:text-white ' + `${pageTitle === 'Current Exchange Rate' ? 'bg-gray-900' : ''}`) Live Exchange Rates
+                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/recent-activities', class='hover:bg-gray-700 hover:text-white ' + `${pageTitle === 'Recent Activities' ? 'bg-gray-900' : ''}`) Activities
+                                        a.rounded-md.px-3.py-2.text-sm.font-medium.text-gray-300(href='/users/ogout', class='hover:bg-gray-700 hover:text-white') Logout
                             .hidden(class='md:block')
                                 .ml-4.flex.items-center(class='md:ml-6')
                                     // Profile dropdown

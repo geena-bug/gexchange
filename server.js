@@ -53,11 +53,6 @@ app.use(function(req, res, next){
 app.use('/', indexRouter); // Use the indexRouter for the root URL
 app.use('/users', usersRouter); // Use the usersRouter for '/users' URL
 app.use('/auth', authRouter); // Use the authRouter for '/auth' URL
-app.get('/test-flash', (req, res) => {
-  // req.flash('error_msg', 'Flash message working correctly!');
-  req.flash('success', 'Welcome!!');
-  res.redirect('/auth/login');
-});
 
 // Catch 404 errors and forward them to the error handler
 app.use(function(req, res, next) {
